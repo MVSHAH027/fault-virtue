@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>દશેરાનું સાચું રહસ્ય</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .page-content {
+            display: none;
+        }
+        .lang-btn.active {
+            background-color: #10B981; /* emerald-500 */
+            color: white;
+        }
+
+        /* Flashcard styles */
+        .flashcard-container {
+            perspective: 1000px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .flashcard-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        .flashcard-front {
+            background-color: #3B82F6; /* blue-500 */
+            color: white;
+        }
+        .flashcard-back {
+            background-color: #6D28D9; /* violet-700 */
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        /* Game styles */
+        #gameCanvas1, #gameCanvas2 {
+            background: linear-gradient(to bottom, #87CEEB, #F0E68C);
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-orange-500 text-white p-4 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto max-w-5xl">
+            <h1 id="app-title" class="text-2xl md:text-3xl font-bold text-center">દશેરાનું સાચું રહસ્ય</h1>
+            <p id="app-subtitle" class="text-center text-sm md:text-base mt-1">આંતરિક રાવણનો વધ</p>
+            <div id="lang-selector" class="flex justify-center space-x-2 mt-4">
+                <button onclick="changeLanguage('gu')" class="lang-btn gu px-4 py-1.5 rounded-full bg-white text-orange-600 shadow-sm transition-transform transform hover:scale-105 active">ગુજરાતી</button>
+                <button onclick="changeLanguage('hi')" class="lang-btn hi px-4 py-1.5 rounded-full bg-white text-orange-600 shadow-sm transition-transform transform hover:scale-105">हिन्दी</button>
+                <button onclick="changeLanguage('en')" class="lang-btn en px-4 py-1.5 rounded-full bg-white text-orange-600 shadow-sm transition-transform transform hover:scale-105">English</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto max-w-5xl p-4 md:p-6">
+        
+        <!-- Main Menu -->
+        <div id="main-menu" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Vertical links will be populated by JavaScript -->
+        </div>
+
+        <!-- Sections (previously tabs) -->
+        <div id="full-video" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <div class="bg-white p-6 rounded-lg shadow text-center"><!-- Content is dynamically inserted here --></div>
+        </div>
+
+        <div id="short-video" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+             <div class="bg-white p-6 rounded-lg shadow text-center"><!-- Content is dynamically inserted here --></div>
+        </div>
+        
+        <div id="story" class="page-content">
+             <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <div class="bg-white p-6 rounded-lg shadow text-center"><!-- Content will be dynamically inserted here --></div>
+        </div>
+        
+        <div id="read" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <div class="prose max-w-none bg-white p-6 rounded-lg shadow"><!-- Content is dynamically inserted here --></div>
+        </div>
+
+        <div id="flashcards-meaning" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <h2 id="flashcards-meaning-title" class="text-2xl font-bold mb-4 text-center text-purple-700"></h2>
+            <div id="flashcards-meaning-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <div id="flashcards-example" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <h2 id="flashcards-example-title" class="text-2xl font-bold mb-4 text-center text-teal-700"></h2>
+            <div id="flashcards-example-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+
+        <div id="match" class="page-content">
+             <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <h2 id="match-title" class="text-2xl font-bold mb-2 text-center text-indigo-700"></h2>
+            <p id="match-instructions" class="mb-4 text-gray-600 text-center"></p>
+            <div id="match-flashcards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+        
+        <div id="quiz1" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <h2 id="quiz1-title" class="text-2xl font-bold mb-4 text-center text-rose-700"></h2>
+            <div id="quiz1-container" class="bg-white p-6 rounded-lg shadow space-y-8"></div>
+             <div class="text-center mt-6">
+                 <p id="quiz1-score" class="text-xl font-bold"></p>
+                <button id="quiz1-restart-btn" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition hidden"></button>
+            </div>
+        </div>
+
+        <div id="quiz2" class="page-content">
+             <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+             <h2 id="quiz2-title" class="text-2xl font-bold mb-4 text-center text-cyan-700"></h2>
+            <div id="quiz2-container" class="bg-white p-6 rounded-lg shadow space-y-8"></div>
+            <div class="text-center mt-6">
+                <button id="quiz2-submit-btn" class="px-8 py-3 bg-green-500 text-white font-bold rounded-lg shadow-lg hover:bg-green-600 transition"></button>
+                <p id="quiz2-score" class="text-xl font-bold mt-4"></p>
+                <button id="quiz2-restart-btn" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition hidden"></button>
+            </div>
+        </div>
+
+        <div id="game1" class="page-content">
+             <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <div class="text-center">
+                <h2 id="game1-title" class="text-2xl font-bold mb-2 text-center text-lime-700"></h2>
+                <div class="flex justify-center space-x-4 mb-4">
+                    <button id="start-game1-btn" class="px-6 py-2 bg-green-500 text-white font-bold rounded-lg shadow hover:bg-green-600"></button>
+                    <button id="help-game1-btn" onclick="showHelp('game1')" class="px-6 py-2 bg-white text-red-500 font-bold rounded-lg shadow hover:bg-gray-100"></button>
+                </div>
+                <p id="game1-instructions" class="mb-4 text-gray-600"></p>
+                <div id="game1-info" class="font-mono text-lg mb-2"></div>
+                <canvas id="gameCanvas1" width="480" height="320" class="mx-auto"></canvas>
+            </div>
+        </div>
+
+        <div id="game2" class="page-content">
+            <button onclick="goToMainMenu()" class="back-btn mb-4 px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition"></button>
+            <div class="text-center">
+                <h2 id="game2-title" class="text-2xl font-bold mb-2 text-center text-fuchsia-700"></h2>
+                <div class="flex justify-center space-x-4 mb-4">
+                     <button id="start-game2-btn" class="px-6 py-2 bg-green-500 text-white font-bold rounded-lg shadow hover:bg-green-600"></button>
+                     <button id="help-game2-btn" onclick="showHelp('game2')" class="px-6 py-2 bg-white text-red-500 font-bold rounded-lg shadow hover:bg-gray-100"></button>
+                </div>
+                <p id="game2-instructions" class="mb-4 text-gray-600"></p>
+                <canvas id="gameCanvas2" width="480" height="320" class="mx-auto"></canvas>
+                <div id="game2-question-modal" class="modal" onclick="closeGame2Question()">
+                    <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-md mx-auto mt-20 text-center" onclick="event.stopPropagation()">
+                        <h3 id="game2-question-text" class="text-lg font-semibold mb-4"></h3>
+                        <div id="game2-options" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-6 mt-8">
+        <div class="container mx-auto max-w-5xl text-center">
+            <p class="font-bold text-lg">Manish V. Shah</p>
+            <p>WhatsApp: 94299 26447</p>
+            <p>(Vadodara)</p>
+        </div>
+    </footer>
+    
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal" onclick="closeHelp()">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-lg mx-auto mt-20" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h2 id="help-title" class="text-2xl font-bold text-gray-800"></h2>
+                <button onclick="closeHelp()" class="text-gray-500 hover:text-red-500 text-3xl">&times;</button>
+            </div>
+            <div id="help-content" class="text-gray-700 space-y-3">
+                <!-- Help content goes here -->
+            </div>
+        </div>
+    </div>
+
+<script>
+// --- CONTENT DATABASE ---
+const contentData = {
+    gu: {
+        title: "દશેરાનું સાચું રહસ્ય",
+        subtitle: "આંતરિક રાવણનો વધ",
+        tabNames: ["સંપૂર્ણ સમજૂતી", "ટૂંકી સમજૂતી", "વાર્તા", "વાંચો", "ફ્લેશકાર્ડ (અર્થ)", "ફ્લેશકાર્ડ (ઉદાહરણ)", "દોષ vs સદગુણ", "ક્વિઝ 1", "ક્વિઝ 2", "રમત 1", "રમત 2"],
+        read: `
+            <div class='space-y-6'>
+                <div class='text-center p-4 bg-orange-100 rounded-lg'>
+                    <h2 class='text-2xl font-bold text-orange-800'>દશેરાનું સાચું રહસ્યઃ આંતરિક રાવણનો વધ</h2>
+                    <p class='text-md text-orange-600 font-semibold mt-1'>એક સામાજિક ચિંતક અને આધ્યાત્મિક ગુરુનો સમાજને સંદેશ</p>
+                </div>
+
+                <div class='text-lg'>
+                    <p class='font-bold text-gray-700'>મારા વ્હાલા આત્મજનો,</p>
+                    <p class='mt-2'>દશેરાનો પવિત્ર તહેવાર ફરી એકવાર આપણા આંગણે આવી પહોંચ્યો છે. આપણે સૌ આ દિવસને ભગવાન શ્રીરામના રાવણ પરના વિજય તરીકે ઉજવીએ છીએ. ફટાકડા ફૂટે છે, મેળા ભરાય છે અને રાવણના મોટા મોટા પૂતળાનું દહન થાય છે. પણ શું આપણે ક્યારેય વિચાર્યું છે કે આ તહેવારનો સાચો અર્થ શું છે? શું રાવણ ફક્ત દસ માથાંવાળો એક રાક્ષસ હતો જે હજારો વર્ષો પહેલાં માર્યો ગયો? કે પછી રાવણ આજે પણ આપણી અંદર, આપણા સમાજમાં જીવંત છે?</p>
+                    <p class='mt-4'>આજે હું તમને દશેરાના એ ગહન રહસ્ય વિશે વાત કરવા આવ્યો છું, જે ફક્ત બહારના શત્રુ પર વિજય મેળવવાની વાત નથી કરતું, પરંતુ આપણી અંદર રહેલા અસલી રાવણને ઓળખીને તેનો નાશ કરવાની પ્રેરણા આપે છે. આજનો રાવણ કોઈ એક વ્યક્તિ નથી, પરંતુ એ દસ ભયંકર દોષોનું પ્રતીક છે જે આપણને અને આપણા સમાજને અંદરથી ખોખલો કરી રહ્યા છે. ચાલો, આજના આધુનિક રાવણના દસ મુખોને ઓળખીએ અને તેને પરાસ્ત કરવાનો સંકલ્પ લઈએ.</p>
+                </div>
+
+                <div>
+                    <h3 class='text-xl font-bold text-red-700 border-b-2 border-red-200 pb-2 mb-4'>આધુનિક રાવણના દસ મુખઃ દોષોનું વિગતવાર વિશ્લેષણ</h3>
+                    <p class='mb-4'>આજના યુગમાં રાવણ એટલે એ દરેક વ્યક્તિ જેમાં નીચેના દસ દોષોમાંથી કોઈ એક કે વધુ દોષો રહેલા છે:</p>
+                    <div class='space-y-8'>
+                        <div><p><b class='text-lg text-gray-800'>૧. અહંકાર (Ego):</b> અહંકાર એટલે 'હું જ શ્રેષ્ઠ છું' એવો ભાવ. આ દોષ વ્યક્તિને સત્ય અને જ્ઞાનથી દૂર રાખે છે. અહંકારી વ્યક્તિ પોતાની ભૂલ ક્યારેય સ્વીકારતી નથી અને બીજાને હંમેશાં તુચ્છ સમજે છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> એક અત્યંત પ્રતિભાશાળી કલાકાર, જે પોતાના અહંકારને કારણે કોઈની સલાહ માનતો નથી, તે ધીમે ધીમે પોતાની કળા ગુમાવી દે છે અને લોકો તેને ભૂલી જાય છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૨. સ્વાર્થ (Selfishness):</b> સ્વાર્થ એટલે ફક્ત પોતાનો જ વિચાર કરવો. સ્વાર્થી વ્યક્તિ 'મારું શું?' એ પ્રશ્નથી જ જીવન જીવે છે. બીજાના દુઃખ કે જરૂરિયાતની તેને કોઈ પરવા હોતી નથી. <span class='font-bold text-red-500'>ઉદાહરણ:</span> એક વેપારી વધુ નફો કમાવવા માટે ખાદ્ય પદાર્થોમાં ભેળસેળ કરે છે, જે હજારો લોકોના સ્વાસ્થ્યને નુકસાન પહોંચાડે છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૩. ઈર્ષા (Jealousy):</b> ઈર્ષા એટલે બીજાની સફળતા, સુખ કે સમૃદ્ધિ જોઈને બળવું. ઈર્ષાળુ વ્યક્તિ બીજાનું સારું જોઈ શકતી નથી અને તેનું ખરાબ ઈચ્છે છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> ઓફિસમાં સહકર્મીને પ્રમોશન મળતા ઈર્ષાથી પીડાતો કર્મચારી તેની વિરુદ્ધ ખોટી અફવાઓ ફેલાવીને તેનું કરિયર બરબાદ કરવાનો પ્રયત્ન કરે છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૪. નિંદા (Criticism/Slander):</b> નિંદા એટલે કોઈની પીઠ પાછળ તેના વિશે ખરાબ બોલવું. આ એક એવું ઝેર છે જે સંબંધો અને વિશ્વાસને મારી નાખે છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> પાડોશીઓ એકસાથે બેસીને કોઈ ત્રીજા પાડોશીની નિંદા કરે છે, જેનાથી આખા મોહલ્લાનું વાતાવરણ બગડે છે અને સંબંધોમાં કડવાશ આવે છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૫. દ્વેષ અને વેર (Hatred and Revenge):</b> કોઈના પ્રત્યે મનમાં ગાંઠ વાળીને બદલો લેવાની ભાવના રાખવી. આ આગ વ્યક્તિને અંદરથી બાળી નાખે છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> બે જૂથો વચ્ચેની નાની લડાઈ વેરની આગમાં ફેરવાઈ જાય છે અને વર્ષો સુધી ચાલતા ગેંગવોરમાં પરિણમે છે, જે આખા વિસ્તારની શાંતિ હણી લે છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૬. હિંસા (Violence/Insensitivity):</b> ફક્ત શારીરિક જ નહીં, પરંતુ વાણી અને વિચારથી પણ કોઈને દુઃખ પહોંચાડવું તે હિંસા છે. બીજાના દુઃખ પ્રત્યે સંવેદનહીન બનવું એ પણ હિંસાનું જ એક સ્વરૂપ છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> રસ્તા પર ઘાયલ પડેલા વ્યક્તિને મદદ કરવાને બદલે લોકો વિડીયો ઉતારે છે. આ સામાજિક અસંવેદનશીલતાનું જીવંત ઉદાહરણ છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૭. ભૌતિકવાદ અને ભોગવાદ (Materialism and Hedonism):</b> જીવનનું એકમાત્ર લક્ષ્ય વધુને વધુ વસ્તુઓ ભેગી કરવી અને ઈન્દ્રિયોના સુખમાં ડૂબેલા રહેવું. આ દોડ ક્યારેય પૂરી થતી નથી. <span class='font-bold text-red-500'>ઉદાહરણ:</span> એક વ્યક્તિ મોંઘો ફોન ખરીદવા માટે પોતાની કિડની વેચી દે છે. આ ભૌતિકવાદની ચરમસીમા છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૮. ઝૂઠ (અસત્ય) (Lying):</b> પોતાના નાના-મોટા ફાયદા માટે સત્યને છુપાવવું કે બદલી નાખવું. એક ઝૂઠને છુપાવવા માટે બીજા સો ઝૂઠ બોલવા પડે છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> જાહેરાતોમાં બતાવવામાં આવતા ખોટા દાવાઓ ગ્રાહકોને ગેરમાર્ગે દોરે છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૯. ચોરી (Theft):</b> બીજાની માલિકીની વસ્તુ તેની પરવાનગી વિના લઈ લેવી. આ ફક્ત ભૌતિક વસ્તુઓની જ નહીં, પરંતુ કોઈના વિચારો, સમય કે અધિકારોની પણ ચોરી હોઈ શકે છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> કોઈ લેખકના પુસ્તકની નકલ કરીને પોતાના નામે છપાવી દેવી એ બૌદ્ધિક સંપદાની ચોરી છે.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>૧૦. ભ્રષ્ટાચાર અને સંગ્રહખોરી (Corruption and Hoarding):</b> પોતાના પદ અને સત્તાનો દુરુપયોગ કરીને અંગત લાભ મેળવવો તે ભ્રષ્ટાચાર છે. <span class='font-bold text-red-500'>ઉદાહરણ:</span> દુકાળના સમયે અનાજનો સંગ્રહ કરીને વેપારીઓ ઊંચા ભાવે વેચે છે, જેના કારણે ગરીબ લોકોને ભૂખમરાનો સામનો કરવો પડે છે.</p></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class='text-xl font-bold text-green-700 border-b-2 border-green-200 pb-2 mb-4'>આંતરિક રાવણના વધનો ઉપાય અને તેના ફાયદા</h3>
+                    <h4 class='font-bold text-lg text-gray-800 mt-4'>ઉપાયો:</h4>
+                    <ol class='list-decimal list-inside space-y-2 mt-2 ml-4 text-gray-700'>
+                        <li><b>આત્મનિરીક્ષણ (Introspection):</b> દરરોજ થોડો સમય પોતાની જાત સાથે બેસીને વિચારો કે આપણામાં આમાંથી કયો દોષ છે. પ્રામાણિકપણે પોતાની ભૂલોને સ્વીકારવી એ પરિવર્તનનું પ્રથમ પગથિયું છે.</li>
+                        <li><b>શિક્ષા અને સંસ્કાર (Education and Values):</b> બાળકોને અહંકારને બદલે નમ્રતા, સ્વાર્થને બદલે સેવા, ઈર્ષાને બદલે પ્રશંસા અને દ્વેષને બદલે ક્ષમા શીખવવી જોઈએ.</li>
+                        <li><b>સત્સંગ (Good Company):</b> સારા અને સકારાત્મક લોકોની સંગત કરો. સારા પુસ્તકો વાંચો, સારા વિચારો સાંભળો. સંગતનો રંગ લાગે છે.</li>
+                        <li><b>સંતોષ અને સંયમ (Contentment and Self-Control):</b> ભૌતિકવાદની અંધાધૂંધ દોડમાંથી બહાર નીકળીને 'જેટલું છે તેટલું પૂરતું છે' એ ભાવ કેળવો.</li>
+                        <li><b>સત્ય અને પ્રામાણિકતાનો માર્ગ (Path of Truth and Honesty):</b> ભલે ગમે તેટલી મુશ્કેલી આવે, સત્યનો માર્ગ ક્યારેય ન છોડો.</li>
+                        <li><b>કરુણા અને સંવેદનશીલતા (Compassion and Sensitivity):</b> બીજાના દુઃખને પોતાનું દુઃખ સમજો. માનવી, પશુ-પક્ષી અને પ્રકૃતિ પ્રત્યે કરુણાનો ભાવ કેળવો.</li>
+                    </ol>
+                    <h4 class='font-bold text-lg text-gray-800 mt-6'>ફાયદા:</h4>
+                     <ul class='list-disc list-inside space-y-2 mt-2 ml-4 text-gray-700'>
+                        <li><b>વ્યક્તિગત સ્તરે:</b> જીવનમાં સાચી શાંતિ, આનંદ અને સંતોષનો અનુભવ થાય છે.</li>
+                        <li><b>પારિવારિક સ્તરે:</b> પરિવારમાં પ્રેમ, એકતા અને સંવાદિતાનું વાતાવરણ સર્જાય છે.</li>
+                        <li><b>સામાજિક સ્તરે:</b> સમાજમાંથી ગુનાખોરી, ભ્રષ્ટાચાર અને સંઘર્ષ ઓછા થાય છે.</li>
+                        <li><b>રાષ્ટ્રીય સ્તરે:</b> દેશ પ્રગતિના પંથે આગળ વધે છે અને વિશ્વમાં એક મજબૂત અને સન્માનનીય સ્થાન પ્રાપ્ત કરે છે.</li>
+                    </ul>
+                </div>
+
+                <div class='text-center p-4 bg-blue-100 rounded-lg'>
+                    <h3 class='text-xl font-bold text-blue-800'>સમાપન: ચાલો, સાચા અર્થમાં દશેરા ઉજવીએ</h3>
+                    <p class='mt-2 text-gray-700'>દશેરાનો સાચો સંદેશ રાવણના પૂતળાને બાળવાનો નથી, પરંતુ આપણી અંદર રહેલા અહંકાર, સ્વાર્થ, ઈર્ષા અને અન્ય દોષોરૂપી રાવણને જ્ઞાન અને સદગુણોના બાણથી બાળવાનો છે. ચાલો, આ દશેરાએ આપણે સૌ સંકલ્પ કરીએ કે આપણે આપણી અંદરના રાવણને ઓળખીશું અને તેને હંમેશ માટે પરાસ્ત કરીશું.</p>
+                    <p class='mt-4 font-bold text-xl text-orange-500'>|| જય શ્રી રામ ||</p>
+                </div>
+            </div>
+        `,
+        fullVideoContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-blue-700">સંપૂર્ણ સમજૂતી (ઓડિયો)</h2>
+            <p class="mb-4 text-gray-600">આધુનિક રાવણના દસ મુખ : દશેરાનો અસલી અર્થ અને આંતરિક દુર્ગુણો પર વિજય.</p>
+            <a href="https://youtu.be/cmCVE0aW5no" target="_blank" class="inline-block px-8 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                YouTube પર સાંભળો
+            </a>
+        `,
+        shortVideoContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-green-700">ટૂંકી સમજૂતી (વિડિયો)</h2>
+            <p class="mb-4 text-gray-600">દશેરાનું સાચું રહસ્ય : આજના રાવણના ૧૦ ભયંકર ચહેરા: શું તમારામાં આ દોષ છે?</p>
+            <a href="https://youtu.be/G62NzXH948Q" target="_blank" class="inline-block px-8 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                YouTube પર જુઓ
+            </a>
+        `,
+        storyContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-cyan-700">વાર્તા: અંદરનો રાવણ</h2>
+            <p class="mb-4 text-gray-600">આ વાર્તા વાંચો અને આંતરિક દોષોને ઓળખવાનો પ્રયાસ કરો.</p>
+            <a href="https://g.co/gemini/share/adb01a8b955b" target="_blank" class="inline-block px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition transform hover:scale-105">
+                વાર્તા વાંચો
+            </a>
+            <p class="mt-6 text-gray-700">વાર્તા સાંભળવા અને જોવા માટે 'Listen' બટન પર ક્લિક કરો.</p>
+        `,
+        faults: [
+            { id: 1, name: "અહંકાર", meaning: "'હું જ શ્રેષ્ઠ છું' એવો ભાવ, જે વ્યક્તિને સત્ય અને જ્ઞાનથી દૂર રાખે છે.", example: "એક પ્રતિભાશાળી કલાકાર, જે પોતાના અહંકારને કારણે કોઈની સલાહ માનતો નથી, તે ધીમે ધીમે પોતાની કળા ગુમાવી દે છે." },
+            { id: 2, name: "સ્વાર્થ", meaning: "ફક્ત પોતાનો જ વિચાર કરવો અને બીજાના દુઃખ કે જરૂરિયાતની પરવા ન કરવી.", example: "એક વેપારી વધુ નફો કમાવવા માટે ખાદ્ય પદાર્થોમાં ભેળસેળ કરે છે, જે હજારો લોકોના સ્વાસ્થ્યને નુકસાન પહોંચાડે છે." },
+            { id: 3, name: "ઈર્ષા", meaning: "બીજાની સફળતા, સુખ કે સમૃદ્ધિ જોઈને બળવું અને તેનું ખરાબ ઈચ્છવું.", example: "ઓફિસમાં સહકર્મીને પ્રમોશન મળતા ઈર્ષાથી પીડાતો કર્મચારી તેની વિરુદ્ધ ખોટી અફવાઓ ફેલાવે છે." },
+            { id: 4, name: "નિંદા", meaning: "કોઈની પીઠ પાછળ તેના વિશે ખરાબ બોલવું, જે સંબંધો અને વિશ્વાસને મારી નાખે છે.", example: "પાડોશીઓ એકસાથે બેસીને કોઈ ત્રીજા પાડોશીની નિંદા કરે છે, જેનાથી મોહલ્લાનું વાતાવરણ બગડે છે." },
+            { id: 5, name: "દ્વેષ અને વેર", meaning: "કોઈના પ્રત્યે મનમાં ગાંઠ વાળીને બદલો લેવાની ભાવના રાખવી.", example: "બે જૂથો વચ્ચેની નાની લડાઈ વેરની આગમાં ફેરવાઈ જાય છે અને વર્ષો સુધી ચાલતા ગેંગવોરમાં પરિણમે છે." },
+            { id: 6, name: "હિંસા", meaning: "શારીરિક, વાણી કે વિચારથી કોઈને દુઃખ પહોંચાડવું અથવા સંવેદનહીન બનવું.", example: "રસ્તા પર ઘાયલ પડેલા વ્યક્તિને મદદ કરવાને બદલે લોકો વિડીયો ઉતારે છે, જે સામાજિક અસંવેદનશીલતા છે." },
+            { id: 7, name: "ભોગવાદ", meaning: "વધુને વધુ વસ્તુઓ ભેગી કરવી અને ઈન્દ્રિયોના સુખમાં ડૂબેલા રહેવું.", example: "એક વ્યક્તિ મોંઘો ફોન ખરીદવા માટે પોતાની કિડની વેચી દે છે." },
+            { id: 8, name: "ઝૂઠ (અસત્ય)", meaning: "પોતાના ફાયદા માટે સત્યને છુપાવવું કે બદલી નાખવું.", example: "જાહેરાતોમાં બતાવવામાં આવતા ખોટા દાવાઓ ગ્રાહકોને ગેરમાર્ગે દોરે છે." },
+            { id: 9, name: "ચોરી", meaning: "બીજાની માલિકીની વસ્તુ પરવાનગી વિના લઈ લેવી, ભૌતિક કે બૌદ્ધિક.", example: "કોઈ લેખકના પુસ્તકની નકલ કરીને પોતાના નામે છપાવી દેવી એ બૌદ્ધિક સંપદાની ચોરી છે." },
+            { id: 10, name: "ભ્રષ્ટાચાર", meaning: "પોતાના પદ અને સત્તાનો દુરુપયોગ કરીને અંગત લાભ મેળવવો.", example: "દુકાળના સમયે અનાજનો સંગ્રહ કરીને વેપારીઓ ઊંચા ભાવે વેચે છે." }
+        ],
+        virtues: [
+             { id: 1, name: "નમ્રતા" }, { id: 2, name: "સેવાભાવ" }, { id: 3, name: "પ્રશંસા" }, { id: 4, name: "સારી વાણી" },
+             { id: 5, name: "ક્ષમા" }, { id: 6, name: "કરુણા" }, { id: 7, name: "સંતોષ" }, { id: 8, name: "સત્ય" },
+             { id: 9, name: "પ્રામાણિકતા" }, { id: 10, name: "નિષ્ઠા" }
+        ],
+        quiz1: [
+            { q: "આધુનિક રાવણનું પ્રથમ મુખ કયું છે?", o: ["સ્વાર્થ", "અહંકાર", "ઈર્ષા", "હિંસા"], a: "અહંકાર", exp: "અહંકાર એ પ્રથમ અને સૌથી મોટો દોષ છે, જે 'હું જ શ્રેષ્ઠ છું' એવો ભાવ પેદા કરે છે અને અન્ય દોષોને જન્મ આપે છે." },
+            { q: "બીજાની સફળતા જોઈને બળવાની ભાવનાને શું કહેવાય?", o: ["દ્વેષ", "નિંદા", "ઈર્ષા", "અહંકાર"], a: "ઈર્ષા", exp: "ઈર્ષા એટલે બીજાનું સુખ કે સફળતા સહન ન કરી શકવી અને તેનું ખરાબ ઈચ્છવું." },
+            { q: "પોતાના પદનો દુરુપયોગ કરી અંગત લાભ મેળવવો તેને શું કહેવાય?", o: ["ચોરી", "ભ્રષ્ટાચાર", "ભોગવાદ", "સ્વાર્થ"], a: "ભ્રષ્ટાચાર", exp: "ભ્રષ્ટાચાર એ સત્તાનો દુરુપયોગ છે જે સમાજ અને દેશના વિકાસને અવરોધે છે." },
+            { q: "આંતરિક રાવણને હરાવવા માટે કયો ગુણ જરૂરી છે?", o: ["સંતોષ", "સત્ય", "કરુણા", "ઉપરોક્ત તમામ"], a: "ઉપરોક્ત તમામ", exp: "આંતરિક રાવણ એટલે કે દસ દોષોને હરાવવા માટે સંતોષ, સત્ય, કરુણા જેવા અનેક સદગુણો કેળવવા જરૂરી છે." },
+            { q: "દશેરાનો સાચો સંદેશ શું છે?", o: ["ફટાકડા ફોડવા", "રાવણ દહન કરવું", "મેળામાં ફરવું", "આંતરિક દોષોનો નાશ કરવો"], a: "આંતરિક દોષોનો નાશ કરવો", exp: "દશેરાનો ગહન અર્થ બહારના પૂતળાને બાળવાનો નહીં, પરંતુ આપણી અંદર રહેલા દોષરૂપી રાવણને બાળવાનો છે." },
+        ],
+        quiz2: [
+            { q: "નીચેનામાંથી કયા દોષો સામાજિક સંબંધોને નુકસાન પહોંચાડે છે?", o: ["નિંદા", "ઈર્ષા", "સ્વાર્થ", "સંતોષ"], a: ["નિંદા", "ઈર્ષા", "સ્વાર્થ"] },
+            { q: "ભગવાન શ્રીરામના કયા ગુણો આપણને આંતરિક રાવણને હરાવવામાં મદદ કરી શકે છે?", o: ["સત્ય", "કરુણા", "અહંકાર", "ક્ષમા"], a: ["સત્ય", "કરુણા", "ક્ષમા"] },
+            { q: "ભૌતિકવાદ અને ભોગવાદના પરિણામો કયા હોઈ શકે છે?", o: ["આંતરિક શાંતિનો નાશ", "પારિવારિક સંબંધોમાં અંતર", "આધ્યાત્મિક વિકાસ", "અસંતોષ"], a: ["આંતરિક શાંતિનો નાશ", "પારિવારિક સંબંધોમાં અંતર", "અસંતોષ"] },
+        ],
+        ui: {
+            // Titles and instructions
+            "flashcards-meaning-title": "દોષો અને તેમના અર્થ",
+            "flashcards-example-title": "દોષો અને તેમના ઉદાહરણો",
+            "match-title": "દોષો (રાવણ) vs સદગુણો (રામ)",
+            "match-instructions": "કાર્ડ પર ક્લિક કરીને દોષનો વિરોધી સદગુણ જુઓ.",
+            "quiz1-title": "જ્ઞાન ચકાસણી (યોગ્ય વિકલ્પ પસંદ કરો)",
+            "quiz2-title": "જ્ઞાન ચકાસણી (એકથી વધુ વિકલ્પ પસંદ કરો)",
+            "game1-title": "રમત: સદગુણનું લક્ષ્યવેધન",
+            "game1-instructions": "સદગુણોના બાણ વડે દોષોનો નાશ કરો!",
+            "game2-title": "રમત: જ્ઞાનનો માર્ગ",
+            "game2-instructions": "જ્ઞાનના પ્રશ્નોના જવાબ આપીને લક્ષ્ય સુધી પહોંચો.",
+            "help-title": "રમતના નિયમો",
+            "back_to_main": "← મુખ્ય પૃષ્ઠ",
+            // Buttons
+            "quiz1-restart-btn": "ફરીથી શરૂ કરો",
+            "quiz2-submit-btn": "જવાબ સબમિટ કરો",
+            "quiz2-restart-btn": "ફરીથી શરૂ કરો",
+            "start-game1-btn": "શરૂ કરો",
+            "start-game2-btn": "શરૂ કરો",
+            "help-game1-btn": "મદદ",
+            "help-game2-btn": "મદદ",
+            // Game 1 Help
+            "game1-help": `
+                <h4 class='font-bold text-lg'>ઉદ્દેશ્ય:</h4>
+                <p>સદગુણોના બાણ વડે બધા દોષોને નષ્ટ કરો. દરેક દોષને તેના સાચા વિરોધી સદગુણથી જ હરાવી શકાય છે.</p>
+                <h4 class='font-bold text-lg mt-2'>કેવી રીતે રમવું:</h4>
+                <ul class='list-disc list-inside'>
+                    <li>બાણ છોડવા માટે ધનુષ (નીચે વાદળી ગોળો) પર ક્લિક કરો/ટચ કરો અને પાછળ ખેંચો.</li>
+                    <li>નિશાન લગાવો અને બાણ છોડવા માટે ક્લિક/ટચ છોડી દો.</li>
+                    <li>તમારું આગલું બાણ કયું છે તે ઉપર જમણી બાજુએ બતાવે છે.</li>
+                </ul>
+                <p class='mt-2'>સાચા જોડકા માટે <b>+10</b> પોઈન્ટ મળશે. ખોટા જોડકા માટે <b>-5</b> પોઈન્ટ.</p>
+            `,
+            // Game 2 Help
+            "game2-help": `
+                <h4 class='font-bold text-lg'>ઉદ્દેશ્ય:</h4>
+                <p>દોષરૂપી દિવાલોને તોડીને જ્ઞાનના માર્ગ પર ચાલીને લક્ષ્ય (⭐️) સુધી પહોંચો.</p>
+                <h4 class='font-bold text-lg mt-2'>કેવી રીતે રમવું:</h4>
+                <ul class='list-disc list-inside'>
+                    <li>પાત્રને ખસેડવા માટે એરો કી અથવા સ્ક્રીન પર સ્વાઇપ કરો.</li>
+                    <li>જ્યારે તમે દોષની દીવાલ (દા.ત. 'અહંકાર') પર પહોંચશો, ત્યારે એક પ્રશ્ન પૂછવામાં આવશે.</li>
+                    <li>સાચો જવાબ આપવાથી દીવાલ દૂર થઈ જશે.</li>
+                    <li>ખોટો જવાબ આપવાથી તમે પાછા શરૂઆતમાં આવી જશો.</li>
+                </ul>
+            `
+        }
+    },
+    hi: {
+        title: "दशहरे का सच्चा रहस्य",
+        subtitle: "आंतरिक रावण का वध",
+        tabNames: ["पूर्ण स्पष्टीकरण", "संक्षिप्त स्पष्टीकरण", "कहानी", "पढ़ें", "फ्लैशकार्ड (अर्थ)", "फ्लैशकार्ड (उदाहरण)", "दोष vs सद्गुण", "क्विज़ 1", "क्विज़ 2", "खेल 1", "खेल 2"],
+        read: `
+            <div class='space-y-6'>
+                <div class='text-center p-4 bg-orange-100 rounded-lg'>
+                    <h2 class='text-2xl font-bold text-orange-800'>दशहरे का सच्चा रहस्य: आंतरिक रावण का वध</h2>
+                    <p class='text-md text-orange-600 font-semibold mt-1'>एक सामाजिक चिंतक और आध्यात्मिक गुरु का समाज को संदेश</p>
+                </div>
+                <div class='text-lg'>
+                    <p class='font-bold text-gray-700'>मेरे प्यारे आत्मजनों,</p>
+                    <p class='mt-2'>दशहरे का पवित्र त्योहार एक बार फिर हमारे द्वार पर आ गया है। हम सब इस दिन को भगवान श्रीराम की रावण पर विजय के रूप में मनाते हैं। पर क्या हमने कभी सोचा है कि इस त्योहार का असली मतलब क्या है? क्या रावण सिर्फ दस सिर वाला एक राक्षस था जो हज़ारों साल पहले मारा गया? या फिर रावण आज भी हमारे अंदर, हमारे समाज में जीवित है?</p>
+                    <p class='mt-4'>आज मैं आपको दशहरे के उस गहरे रहस्य के बारे में बताने आया हूँ, जो सिर्फ बाहरी दुश्मन पर विजय पाने की बात नहीं करता, बल्कि हमारे अंदर के असली रावण को पहचानकर उसका नाश करने की प्रेरणा देता है।</p>
+                </div>
+                <div>
+                    <h3 class='text-xl font-bold text-red-700 border-b-2 border-red-200 pb-2 mb-4'>आधुनिक रावण के दस मुख: दोषों का विस्तृत विश्लेषण</h3>
+                    <div class='space-y-8'>
+                        <div><p><b class='text-lg text-gray-800'>१. अहंकार (Ego):</b> 'मैं ही सर्वश्रेष्ठ हूँ' का भाव। यह दोष व्यक्ति को सत्य और ज्ञान से दूर रखता है। <span class='font-bold text-red-500'>उदाहरण:</span> एक प्रतिभाशाली कलाकार, जो अपने अहंकार के कारण किसी की सलाह नहीं मानता, धीरे-धीरे अपनी कला खो देता है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>२. स्वार्थ (Selfishness):</b> केवल अपने बारे में सोचना। स्वार्थी व्यक्ति दूसरों के दुःख या ज़रूरतों की परवाह नहीं करता। <span class='font-bold text-red-500'>उदाहरण:</span> एक व्यापारी अधिक लाभ कमाने के लिए खाद्य पदार्थों में मिलावट करता है, जो हज़ारों लोगों के स्वास्थ्य को नुकसान पहुँचाता है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>३. ईर्ष्या (Jealousy):</b> दूसरों की सफलता या सुख देखकर जलना और उनका बुरा चाहना। <span class='font-bold text-red-500'>उदाहरण:</span> ऑफिस में सहकर्मी को प्रमोशन मिलने पर ईर्ष्या से पीड़ित कर्मचारी उसके खिलाफ झूठी अफवाहें फैलाता है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>४. निंदा (Slander):</b> किसी की पीठ पीछे उसके बारे में बुरा बोलना। यह एक ऐसा ज़हर है जो रिश्तों और विश्वास को खत्म कर देता है। <span class='font-bold text-red-500'>उदाहरण:</span> पड़ोसी एक साथ बैठकर किसी तीसरे पड़ोसी की निंदा करते हैं, जिससे मोहल्ले का माहौल बिगड़ जाता है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>५. द्वेष और प्रतिशोध (Hatred and Revenge):</b> किसी के प्रति मन में गांठ बांधकर बदला लेने की भावना रखना। <span class='font-bold text-red-500'>उदाहरण:</span> दो समूहों के बीच की छोटी लड़ाई प्रतिशोध की आग में बदल जाती है और वर्षों तक चलने वाले गैंगवॉर में परिणत होती है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>६. हिंसा (Violence):</b> केवल शारीरिक ही नहीं, बल्कि वाणी और विचार से भी किसी को दुःख पहुँचाना। <span class='font-bold text-red-500'>उदाहरण:</span> सड़क पर घायल पड़े व्यक्ति की मदद करने के बजाय लोग वीडियो बनाते हैं, यह सामाजिक असंवेदनशीलता है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>७. भोगवाद (Materialism):</b> जीवन का एकमात्र लक्ष्य अधिक से अधिक वस्तुएँ इकट्ठा करना और इंद्रियों के सुख में डूबे रहना। <span class='font-bold text-red-500'>उदाहरण:</span> एक व्यक्ति महंगा फोन खरीदने के लिए अपनी किडनी बेच देता है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>८. झूठ (Lying):</b> अपने लाभ के लिए सच को छिपाना या बदलना। <span class='font-bold text-red-500'>उदाहरण:</span> विज्ञापनों में दिखाए जाने वाले झूठे दावे ग्राहकों को गुमराह करते हैं।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>९. चोरी (Theft):</b> दूसरे की ملکیت वाली वस्तु को उसकी अनुमति के बिना ले लेना। <span class='font-bold text-red-500'>उदाहरण:</span> किसी लेखक की किताब की नकल करके अपने नाम से छाप देना बौद्धिक संपदा की चोरी है।</p></div>
+                        <div><p><b class='text-lg text-gray-800'>१०. भ्रष्टाचार (Corruption):</b> अपने पद और सत्ता का दुरुपयोग करके व्यक्तिगत लाभ प्राप्त करना। <span class='font-bold text-red-500'>उदाहरण:</span> अकाल के समय अनाज का भंडारण करके व्यापारी ऊंचे दामों पर बेचते हैं।</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class='text-xl font-bold text-green-700 border-b-2 border-green-200 pb-2 mb-4'>आंतरिक रावण के वध का उपाय</h3>
+                     <ol class='list-decimal list-inside space-y-2 mt-2 ml-4 text-gray-700'>
+                        <li><b>आत्म-निरीक्षण:</b> अपनी गलतियों को ईमानदारी से स्वीकार करना परिवर्तन का पहला कदम है।</li>
+                        <li><b>शिक्षा और संस्कार:</b> नैतिक मूल्यों को सिखाना, जैसे विनम्रता, सेवा, प्रशंसा और क्षमा।</li>
+                        <li><b>सत्संग:</b> सकारात्मक लोगों के साथ रहें, अच्छी किताबें पढ़ें।</li>
+                        <li><b>संतोष और संयम:</b> जो आपके पास है उसमें संतुष्ट रहना सीखें।</li>
+                        <li><b>सत्य और ईमानदारी का मार्ग:</b> किसी भी परिस्थिति में सच का साथ न छोड़ें।</li>
+                        <li><b>करुणा और संवेदनशीलता:</b> दूसरों के दर्द को समझें।</li>
+                    </ol>
+                </div>
+                <div class='text-center p-4 bg-blue-100 rounded-lg'>
+                    <h3 class='text-xl font-bold text-blue-800'>समापन: आइए, सच्चे अर्थों में दशहरा मनाएं</h3>
+                    <p class='mt-2 text-gray-700'>दशहरे का सच्चा संदेश रावण के पुतले को जलाना नहीं, बल्कि हमारे अंदर बसे दोषों रूपी रावण को ज्ञान और सद्गुणों के बाण से जलाना है।</p>
+                    <p class='mt-4 font-bold text-xl text-orange-500'>|| जय श्री राम ||</p>
+                </div>
+            </div>
+        `,
+        fullVideoContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-blue-700">पूर्ण स्पष्टीकरण (ऑडियो)</h2>
+            <p class="mb-4 text-gray-600">आधुनिक रावण के दस मुख: दशहरे का असली अर्थ और आंतरिक दुर्गुणों पर विजय।</p>
+            <a href="https://youtu.be/cmCVE0aW5no" target="_blank" class="inline-block px-8 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                YouTube पर सुनें
+            </a>
+        `,
+        shortVideoContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-green-700">संक्षिप्त स्पष्टीकरण (वीडियो)</h2>
+            <p class="mb-4 text-gray-600">दशहरे का सच्चा रहस्य: आज के रावण के १० भयंकर चेहरे: क्या आप में यह दोष है?</p>
+            <a href="https://youtu.be/G62NzXH948Q" target="_blank" class="inline-block px-8 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                YouTube पर देखें
+            </a>
+        `,
+        storyContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-cyan-700">कहानी: अंदर का रावण</h2>
+            <p class="mb-4 text-gray-600">यह कहानी पढ़ें और आंतरिक दोषों को पहचानने का प्रयास करें।</p>
+            <a href="https://g.co/gemini/share/adb01a8b955b" target="_blank" class="inline-block px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition transform hover:scale-105">
+                कहानी पढ़ें
+            </a>
+            <p class="mt-6 text-gray-700">कहानी सुनने और देखने के लिए 'Listen' बटन पर क्लिक करें।</p>
+        `,
+        faults: [
+            { id: 1, name: "अहंकार", meaning: "'मैं ही सर्वश्रेष्ठ हूँ' का भाव, जो व्यक्ति को सत्य और ज्ञान से दूर रखता है।", example: "एक प्रतिभाशाली कलाकार, जो अपने अहंकार के कारण किसी की सलाह नहीं मानता, धीरे-धीरे अपनी कला खो देता है।" },
+            { id: 2, name: "स्वार्थ", meaning: "केवल अपना सोचना और दूसरों के दुःख या ज़रूरत की परवाह न करना।", example: "एक व्यापारी अधिक लाभ कमाने के लिए खाद्य पदार्थों में मिलावट करता है, जो हज़ारों लोगों के स्वास्थ्य को नुकसान पहुँचाता है।" },
+            { id: 3, name: "ईर्ष्या", meaning: "दूसरों की सफलता, सुख या समृद्धि देखकर जलना और उनका बुरा चाहना।", example: "ऑफिस में सहकर्मी को प्रमोशन मिलने पर ईर्ष्या से पीड़ित कर्मचारी उसके खिलाफ झूठी अफवाहें फैलाता है।" },
+            { id: 4, name: "निंदा", meaning: "किसी की पीठ पीछे उसके बारे में बुरा बोलना, जो रिश्तों और विश्वास को खत्म कर देता है।", example: "पड़ोसी एक साथ बैठकर किसी तीसरे पड़ोसी की निंदा करते हैं, जिससे मोहल्ले का माहौल बिगड़ जाता है।" },
+            { id: 5, name: "द्वेष और प्रतिशोध", meaning: "किसी के प्रति मन में गांठ बांधकर बदला लेने की भावना रखना।", example: "दो समूहों के बीच की छोटी लड़ाई प्रतिशोध की आग में बदल जाती है और वर्षों तक चलने वाले गैंगवॉर में परिणत होती है।" },
+            { id: 6, name: "हिंसा", meaning: "शारीरिक, वाणी या विचार से किसी को दुःख पहुँचाना या असंवेदनशील बनना।", example: "सड़क पर घायल पड़े व्यक्ति की मदद करने के बजाय लोग वीडियो बनाते हैं, यह सामाजिक असंवेदनशीलता है।" },
+            { id: 7, name: "भोगवाद", meaning: "अधिक से अधिक वस्तुएँ इकट्ठा करना और इंद्रियों के सुख में डूबे रहना।", example: "एक व्यक्ति महंगा फोन खरीदने के लिए अपनी किडनी बेच देता है।" },
+            { id: 8, name: "झूठ (असत्य)", meaning: "अपने लाभ के लिए सच को छिपाना या बदलना।", example: "विज्ञापनों में दिखाए जाने वाले झूठे दावे ग्राहकों को गुमराह करते हैं।" },
+            { id: 9, name: "चोरी", meaning: "दूसरे की ملکیت वाली वस्तु को अनुमति के बिना ले लेना, चाहे वह भौतिक हो या बौद्धिक।", example: "किसी लेखक की किताब की नकल करके अपने नाम से छाप देना बौद्धिक संपदा की चोरी है।" },
+            { id: 10, name: "भ्रष्टाचार", meaning: "अपने पद और सत्ता का दुरुपयोग करके व्यक्तिगत लाभ प्राप्त करना।", example: "अकाल के समय अनाज का भंडारण करके व्यापारी ऊंचे दामों पर बेचते हैं।" }
+        ],
+        virtues: [
+             { id: 1, name: "विनम्रता" }, { id: 2, name: "सेवाभाव" }, { id: 3, name: "प्रशंसा" }, { id: 4, name: "मधुर वाणी" },
+             { id: 5, name: "क्षमा" }, { id: 6, name: "करुणा" }, { id: 7, name: "संतोष" }, { id: 8, name: "सत्य" },
+             { id: 9, name: "ईमानदारी" }, { id: 10, name: "निष्ठा" }
+        ],
+        quiz1: [
+            { q: "आधुनिक रावण का पहला मुख कौन सा है?", o: ["स्वार्थ", "अहंकार", "ईर्ष्या", "हिंसा"], a: "अहंकार", exp: "अहंकार पहला और सबसे बड़ा दोष है, जो 'मैं ही सर्वश्रेष्ठ हूँ' का भाव पैदा करता है और अन्य दोषों को जन्म देता है।" },
+            { q: "दूसरों की सफलता देखकर जलने की भावना को क्या कहते हैं?", o: ["द्वेष", "निंदा", "ईर्ष्या", "अहंकार"], a: "ईर्ष्या", exp: "ईर्ष्या का अर्थ है दूसरों की खुशी या सफलता को सहन न कर पाना और उनका बुरा चाहना।" },
+            { q: "अपने पद का दुरुपयोग कर व्यक्तिगत लाभ प्राप्त करना क्या कहलाता है?", o: ["चोरी", "भ्रष्टाचार", "भोगवाद", "स्वार्थ"], a: "भ्रष्टाचार", exp: "भ्रष्टाचार सत्ता का दुरुपयोग है जो समाज और देश के विकास में बाधा डालता है।" },
+            { q: "आंतरिक रावण को हराने के लिए कौन सा गुण आवश्यक है?", o: ["संतोष", "सत्य", "करुणा", "उपरोक्त सभी"], a: "उपरोक्त सभी", exp: "आंतरिक रावण यानी दस दोषों को हराने के लिए संतोष, सत्य, करुणा जैसे कई सद्गुणों को विकसित करना आवश्यक है।" },
+            { q: "दशहरे का सच्चा संदेश क्या है?", o: ["पटाखे फोड़ना", "रावण दहन करना", "मेले में घूमना", "आंतरिक दोषों का नाश करना"], a: "आंतरिक दोषों का नाश करना", exp: "दशहरे का गहरा अर्थ बाहरी पुतले को जलाना नहीं, बल्कि हमारे अंदर के दोष रूपी रावण को जलाना है।" }
+        ],
+        quiz2: [
+            { q: "निम्नलिखित में से कौन से दोष सामाजिक संबंधों को नुकसान पहुँचाते हैं?", o: ["निंदा", "ईर्ष्या", "स्वार्थ", "संतोष"], a: ["નિંદા", "ईर्ष्या", "स्वार्थ"] },
+            { q: "भगवान श्रीराम के कौन से गुण हमें आंतरिक रावण को हराने में मदद कर सकते हैं?", o: ["सत्य", "करुणा", "अहंकार", "क्षमा"], a: ["सत्य", "करुणा", "क्षમા"] },
+            { q: "भौतिकवाद और भोगवाद के क्या परिणाम हो सकते हैं?", o: ["आंतरिक शांति का नाश", "पारिवारिक संबंधों में दूरी", "आध्यात्मिक विकास", "असंतोष"], a: ["आंतरिक शांति का नाश", "पारिवारिक संबंधों में दूरी", "असंतोष"] }
+        ],
+        ui: {
+            "flashcards-meaning-title": "दोष और उनके अर्थ",
+            "flashcards-example-title": "दोष और उनके उदाहरण",
+            "match-title": "दोष (रावण) vs सद्गुण (राम)",
+            "match-instructions": "कार्ड पर क्लिक करके दोष का विपरीत सद्गुण देखें।",
+            "quiz1-title": "ज्ञान परीक्षण (सही विकल्प चुनें)",
+            "quiz2-title": "ज्ञान परीक्षण (एक से अधिक विकल्प चुनें)",
+            "game1-title": "खेल: सद्गुण भेदन",
+            "game1-instructions": "सद्गुणों के बाणों से दोषों का नाश करें!",
+            "game2-title": "खेल: ज्ञान का मार्ग",
+            "game2-instructions": "ज्ञान के प्रश्नों का उत्तर देकर लक्ष्य तक पहुंचें।",
+            "help-title": "खेल के नियम",
+            "back_to_main": "← मुख्य पृष्ठ",
+            "quiz1-restart-btn": "फिर से शुरू करें",
+            "quiz2-submit-btn": "उत्तर सबमिट करें",
+            "quiz2-restart-btn": "फिर से शुरू करें",
+            "start-game1-btn": "शुरू करें",
+            "start-game2-btn": "शुरू करें",
+            "help-game1-btn": "मदद",
+            "help-game2-btn": "मदद",
+            "game1-help": `
+                <h4 class='font-bold text-lg'>उद्देश्य:</h4>
+                <p>सद्गुणों के बाणों से सभी दोषों को नष्ट करें। प्रत्येक दोष को केवल उसके सही विपरीत सद्गुण से ही हराया जा सकता है।</p>
+                <h4 class='font-bold text-lg mt-2'>कैसे खेलें:</h4>
+                <ul class='list-disc list-inside'>
+                    <li>तीर चलाने के लिए धनुष (नीला गोला) पर क्लिक/टच करें और पीछे खींचें।</li>
+                    <li>निशाना साधें और तीर छोड़ने के लिए रिलीज़ करें।</li>
+                    <li>आपका अगला तीर ऊपर दाईं ओर दिखाया गया है।</li>
+                </ul>
+                 <p class='mt-2'>सही मिलान के लिए <b>+10</b> अंक मिलेंगे। गलत मिलान के लिए <b>-5</b> अंक।</p>
+            `,
+            "game2-help": `
+                <h4 class='font-bold text-lg'>उद्देश्य:</h4>
+                <p>दोष रूपी दीवारों को तोड़कर ज्ञान के मार्ग पर चलकर लक्ष्य (⭐️) तक पहुंचें।</p>
+                <h4 class='font-bold text-lg mt-2'>कैसे खेलें:</h4>
+                <ul class='list-disc list-inside'>
+                    <li>पात्र को स्थानांतरित करने के लिए तीर कुंजी या स्क्रीन पर स्वाइप करें।</li>
+                    <li>जब आप किसी दोष की दीवार (जैसे 'अहंकार') तक पहुँचते हैं, तो एक प्रश्न पूछा जाएगा।</li>
+                    <li>सही उत्तर देने पर दीवार हट जाएगी।</li>
+                    <li>गलत उत्तर देने पर आप शुरुआत में वापस आ जाएंगे।</li>
+                </ul>
+            `
+        }
+    },
+    en: {
+        title: "The True Secret of Dussehra",
+        subtitle: "Vanquishing the Inner Ravana",
+        tabNames: ["Full Explanation", "Short Explanation", "Story", "Read", "Flashcards (Meaning)", "Flashcards (Example)", "Fault vs Virtue", "Quiz 1", "Quiz 2", "Game 1", "Game 2"],
+        read: `
+            <div class='space-y-6'>
+                <div class='text-center p-4 bg-orange-100 rounded-lg'>
+                    <h2 class='text-2xl font-bold text-orange-800'>The True Secret of Dussehra: Vanquishing the Inner Ravana</h2>
+                    <p class='text-md text-orange-600 font-semibold mt-1'>A Message to Society from a Social Thinker and Spiritual Guru</p>
+                </div>
+                <div class='text-lg'>
+                    <p class='font-bold text-gray-700'>My dear souls,</p>
+                    <p class='mt-2'>The holy festival of Dussehra has once again arrived. We celebrate this day as Lord Shri Ram's victory over Ravana. But have we ever considered the true meaning of this festival? Was Ravana merely a ten-headed demon killed thousands of years ago? Or does Ravana still live within us, in our society, today?</p>
+                    <p class='mt-4'>Today, I want to speak about the profound secret of Dussehra, which is not just about conquering an external enemy, but about identifying and destroying the real Ravana that resides within us.</p>
+                </div>
+                <div>
+                    <h3 class='text-xl font-bold text-red-700 border-b-2 border-red-200 pb-2 mb-4'>The Ten Faces of Modern Ravana: A Detailed Analysis of Faults</h3>
+                     <div class='space-y-8'>
+                        <div><p><b class='text-lg text-gray-800'>1. Ego:</b> The feeling of 'I am the best'. This fault distances a person from truth and knowledge. <span class='font-bold text-red-500'>Example:</span> A talented artist who, due to his ego, doesn't listen to anyone's advice, gradually loses his art.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>2. Selfishness:</b> Thinking only of oneself, ignoring the needs and sorrows of others. <span class='font-bold text-red-500'>Example:</span> A merchant adulterates food items to earn more profit, harming the health of thousands.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>3. Jealousy:</b> Feeling resentful of others' success and happiness, and wishing them ill. <span class='font-bold text-red-500'>Example:</span> An employee, jealous of a colleague's promotion, spreads false rumors against them.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>4. Slander:</b> Speaking ill of someone behind their back, a poison that destroys trust. <span class='font-bold text-red-500'>Example:</span> Neighbors sit together and slander a third neighbor, spoiling the atmosphere of the locality.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>5. Hatred and Revenge:</b> Holding grudges and harboring a desire to retaliate. <span class='font-bold text-red-500'>Example:</span> A small fight between two groups turns into a fire of revenge, resulting in years of gang wars.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>6. Violence/Insensitivity:</b> Causing harm not only physically but also through words and thoughts. <span class='font-bold text-red-500'>Example:</span> Instead of helping an injured person on the road, people make videos, which is social insensitivity.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>7. Materialism and Hedonism:</b> Making the accumulation of possessions the sole aim of life. <span class='font-bold text-red-500'>Example:</span> A person sells their kidney to buy an expensive phone.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>8. Lying:</b> Concealing or altering the truth for personal gain. <span class='font-bold text-red-500'>Example:</span> False claims made in advertisements mislead consumers.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>9. Theft:</b> Taking what belongs to others without permission, including ideas and rights. <span class='font-bold text-red-500'>Example:</span> Copying an author's book and publishing it under one's own name is intellectual property theft.</p></div>
+                        <div><p><b class='text-lg text-gray-800'>10. Corruption and Hoarding:</b> Abusing power for personal benefit and creating artificial scarcity. <span class='font-bold text-red-500'>Example:</span> During a famine, merchants hoard grain and sell it at high prices.</p></div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class='text-xl font-bold text-green-700 border-b-2 border-green-200 pb-2 mb-4'>The Path to Vanquishing the Inner Ravana</h3>
+                     <h4 class='font-bold text-lg text-gray-800 mt-4'>Remedies:</h4>
+                    <ol class='list-decimal list-inside space-y-2 mt-2 ml-4 text-gray-700'>
+                        <li><b>Introspection:</b> Honestly acknowledging our faults is the first step toward change.</li>
+                        <li><b>Education and Values:</b> Inculcating moral values like humility, service, and forgiveness.</li>
+                        <li><b>Good Company (Satsang):</b> Associate with positive people and good literature.</li>
+                        <li><b>Contentment and Self-Control:</b> Learn to be satisfied with what you have.</li>
+                        <li><b>Path of Truth and Honesty:</b> Never abandon the truth, no matter the difficulty.</li>
+                        <li><b>Compassion and Sensitivity:</b> Empathize with the suffering of others.</li>
+                    </ol>
+                </div>
+                <div class='text-center p-4 bg-blue-100 rounded-lg'>
+                    <h3 class='text-xl font-bold text-blue-800'>Conclusion: Let's Celebrate Dussehra in its True Spirit</h3>
+                    <p class='mt-2 text-gray-700'>The true message of Dussehra is not about burning an external effigy, but about burning the Ravana of our inner flaws with the arrows of knowledge and virtue.</p>
+                    <p class='mt-4 font-bold text-xl text-orange-500'>|| Jai Shri Ram ||</p>
+                </div>
+            </div>
+        `,
+        fullVideoContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-blue-700">Full Explanation (Audio)</h2>
+            <p class="mb-4 text-gray-600">The Ten Faces of Modern Ravana: The Real Meaning of Dussehra and Victory Over Inner Vices.</p>
+            <a href="https://youtu.be/cmCVE0aW5no" target="_blank" class="inline-block px-8 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                Listen on YouTube
+            </a>
+        `,
+        shortVideoContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-green-700">Short Explanation (Video)</h2>
+            <p class="mb-4 text-gray-600">The True Secret of Dussehra: The 10 Terrible Faces of Today's Ravana: Do you have this fault?</p>
+            <a href="https://youtu.be/G62NzXH948Q" target="_blank" class="inline-block px-8 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                Watch on YouTube
+            </a>
+        `,
+         storyContent: `
+            <h2 class="text-2xl font-bold mb-4 text-center text-cyan-700">Story: The Inner Ravana</h2>
+            <p class="mb-4 text-gray-600">Read this story and try to identify the inner faults.</p>
+            <a href="https://g.co/gemini/share/adb01a8b955b" target="_blank" class="inline-block px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition transform hover:scale-105">
+                Read Story
+            </a>
+            <p class="mt-6 text-gray-700">To listen to and watch the story, click the 'Listen' button.</p>
+        `,
+        faults: [
+            { id: 1, name: "Ego", meaning: "The feeling that 'I am the best', which keeps a person away from truth and knowledge.", example: "A talented artist who, due to his ego, doesn't listen to anyone's advice, gradually loses his art." },
+            { id: 2, name: "Selfishness", meaning: "Thinking only of oneself and not caring about the suffering or needs of others.", example: "A merchant adulterates food items to earn more profit, harming the health of thousands." },
+            { id: 3, name: "Jealousy", meaning: "Burning with envy at others' success, happiness, or prosperity and wishing them ill.", example: "An employee, jealous of a colleague's promotion, spreads false rumors against them." },
+            { id: 4, name: "Slander", meaning: "Speaking ill of someone behind their back, which destroys relationships and trust.", example: "Neighbors sit together and slander a third neighbor, spoiling the atmosphere of the locality." },
+            { id: 5, name: "Hatred & Revenge", meaning: "Holding a grudge against someone and having a desire for revenge.", example: "A small fight between two groups turns into a fire of revenge, resulting in years of gang wars." },
+            { id: 6, name: "Violence", meaning: "Causing pain to someone physically, verbally, or mentally; being insensitive.", example: "Instead of helping an injured person on the road, people make videos, which is social insensitivity." },
+            { id: 7, name: "Materialism", meaning: "Accumulating more and more things and being immersed in sensory pleasures.", example: "A person sells their kidney to buy an expensive phone." },
+            { id: 8, name: "Lying", meaning: "Hiding or changing the truth for one's own benefit.", example: "False claims made in advertisements mislead consumers." },
+            { id: 9, name: "Theft", meaning: "Taking someone else's property without permission, be it physical or intellectual.", example: "Copying an author's book and publishing it under one's own name is intellectual property theft." },
+            { id: 10, name: "Corruption", meaning: "Misusing one's position and power for personal gain.", example: "During a famine, merchants hoard grain and sell it at high prices." }
+        ],
+        virtues: [
+             { id: 1, name: "Humility" }, { id: 2, name: "Service" }, { id: 3, name: "Admiration" }, { id: 4, name: "Kind Speech" },
+             { id: 5, name: "Forgiveness" }, { id: 6, name: "Compassion" }, { id: 7, name: "Contentment" }, { id: 8, name: "Truth" },
+             { id: 9, name: "Honesty" }, { id: 10, name: "Integrity" }
+        ],
+        quiz1: [
+            { q: "What is the first face of the modern Ravana?", o: ["Selfishness", "Ego", "Jealousy", "Violence"], a: "Ego", exp: "Ego is the first and biggest fault, creating the feeling of 'I am the best' and giving rise to other faults." },
+            { q: "What is the feeling of burning with envy at the success of others called?", o: ["Hatred", "Slander", "Jealousy", "Ego"], a: "Jealousy", exp: "Jealousy means being unable to tolerate others' happiness or success and wishing them ill." },
+            { q: "What is it called to misuse one's position for personal gain?", o: ["Theft", "Corruption", "Materialism", "Selfishness"], a: "Corruption", exp: "Corruption is the abuse of power that hinders the development of society and the country." },
+            { q: "Which quality is necessary to defeat the inner Ravana?", o: ["Contentment", "Truth", "Compassion", "All of the above"], a: "All of the above", exp: "To defeat the inner Ravana, i.e., the ten faults, it is necessary to cultivate many virtues like contentment, truth, and compassion." },
+            { q: "What is the true message of Dussehra?", o: ["Bursting firecrackers", "Burning Ravana's effigy", "Visiting fairs", "Destroying inner faults"], a: "Destroying inner faults", exp: "The profound meaning of Dussehra is not to burn an external effigy, but to burn the Ravana of faults within us." }
+        ],
+        quiz2: [
+            { q: "Which of the following faults damage social relationships?", o: ["Slander", "Jealousy", "Selfishness", "Contentment"], a: ["Slander", "Jealousy", "Selfishness"] },
+            { q: "Which qualities of Lord Shri Ram can help us defeat the inner Ravana?", o: ["Truth", "Compassion", "Ego", "Forgiveness"], a: ["Truth", "Compassion", "Forgiveness"] },
+            { q: "What can be the consequences of materialism and hedonism?", o: ["Destruction of inner peace", "Distance in family relationships", "Spiritual growth", "Dissatisfaction"], a: ["Destruction of inner peace", "Distance in family relationships", "Dissatisfaction"] }
+        ],
+        ui: {
+            "flashcards-meaning-title": "Faults and Their Meanings",
+            "flashcards-example-title": "Faults and Their Examples",
+            "match-title": "Faults (Ravana) vs Virtues (Ram)",
+            "match-instructions": "Click on a card to see the opposing virtue for each fault.",
+            "quiz1-title": "Knowledge Check (Select the correct option)",
+            "quiz2-title": "Knowledge Check (Select one or more options)",
+            "game1-title": "Game: Virtue Archery",
+            "game1-instructions": "Destroy the faults with the arrows of virtue!",
+            "game2-title": "Game: The Path of Knowledge",
+            "game2-instructions": "Answer knowledge questions to reach the goal.",
+            "help-title": "Game Rules",
+            "back_to_main": "← Back to Main Menu",
+            "quiz1-restart-btn": "Restart Quiz",
+            "quiz2-submit-btn": "Submit Answers",
+            "quiz2-restart-btn": "Restart Quiz",
+            "start-game1-btn": "Start",
+            "start-game2-btn": "Start",
+            "help-game1-btn": "Help",
+            "help-game2-btn": "Help",
+            "game1-help": `
+                <h4 class='font-bold text-lg'>Objective:</h4>
+                <p>Destroy all the faults using the arrows of virtue. Each fault can only be defeated by its correct opposing virtue.</p>
+                <h4 class='font-bold text-lg mt-2'>How to Play:</h4>
+                <ul class='list-disc list-inside'>
+                    <li>Click/touch and drag back on the bow (blue circle at the bottom) to aim.</li>
+                    <li>Release to fire the arrow.</li>
+                    <li>Your next arrow is shown in the top right.</li>
+                </ul>
+                <p class='mt-2'>A correct match scores <b>+10</b> points. A mismatch scores <b>-5</b> points.</p>
+            `,
+            "game2-help": `
+                <h4 class='font-bold text-lg'>Objective:</h4>
+                <p>Reach the goal (⭐️) by breaking through the walls of faults on the path of knowledge.</p>
+                <h4 class='font-bold text-lg mt-2'>How to Play:</h4>
+                <ul class='list-disc list-inside'>
+                    <li>Use arrow keys or swipe on the screen to move the character.</li>
+                    <li>When you hit a fault wall (e.g., 'Ego'), a question will be asked.</li>
+                    <li>Answering correctly will remove the wall.</li>
+                    <li>Answering incorrectly will send you back to the start.</li>
+                </ul>
+            `
+        }
+    }
+};
+
+// --- GLOBAL VARIABLES ---
+let currentLang = 'gu';
+let activeSection = 'main-menu';
+
+// --- CORE FUNCTIONS ---
+function changeLanguage(lang) {
+    currentLang = lang;
+    const data = contentData[lang];
+
+    // Update main titles
+    document.getElementById('app-title').innerText = data.title;
+    document.getElementById('app-subtitle').innerText = data.subtitle;
+
+    // Update language buttons active state
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.lang-btn.${lang}`).classList.add('active');
+
+    // Update main menu link text
+    const sections = ['full-video', 'short-video', 'story', 'read', 'flashcards-meaning', 'flashcards-example', 'match', 'quiz1', 'quiz2', 'game1', 'game2'];
+    sections.forEach((id, index) => {
+        const btn = document.getElementById(`menu-btn-${id}`);
+        if(btn) {
+            btn.querySelector('span.font-semibold').innerText = data.tabNames[index];
+        }
+    });
+
+    // Update back buttons text
+    document.querySelectorAll('.back-btn').forEach(btn => {
+        btn.innerText = data.ui.back_to_main;
+    });
+    
+    // Update UI elements from ui object
+    Object.keys(data.ui).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            // Check for help content, which is HTML
+            if (id.includes('-help')) {
+                element.innerHTML = data.ui[id];
+            } else {
+                element.innerText = data.ui[id];
+            }
+        }
+    });
+    // Re-render content for the currently active section if it's not the main menu
+    if (activeSection !== 'main-menu') {
+        updateSectionContent(activeSection);
+    }
+}
+
+function openSection(sectionId) {
+    activeSection = sectionId;
+    document.getElementById('main-menu').style.display = 'none';
+    
+    document.querySelectorAll('.page-content').forEach(page => page.style.display = 'none');
+    
+    const section = document.getElementById(sectionId);
+    section.style.display = 'block';
+    
+    updateSectionContent(sectionId);
+}
+
+function goToMainMenu() {
+    activeSection = 'main-menu';
+    document.querySelectorAll('.page-content').forEach(page => page.style.display = 'none');
+    document.getElementById('main-menu').style.display = 'grid';
+}
+
+function updateSectionContent(sectionId) {
+    // This function populates content when a section is opened.
+    switch (sectionId) {
+        case 'read':
+            document.querySelector('#read .prose').innerHTML = contentData[currentLang].read;
+            break;
+        case 'flashcards-meaning':
+            loadFlashcards('meaning');
+            break;
+        case 'flashcards-example':
+            loadFlashcards('example');
+            break;
+        case 'match':
+            loadMatchFlashcards();
+            break;
+        case 'quiz1':
+            initQuiz1();
+            break;
+        case 'quiz2':
+            initQuiz2();
+            break;
+        case 'game1':
+             drawGame1Preview();
+            break;
+        case 'game2':
+             // The maze is drawn on game start
+            break;
+        case 'full-video':
+            document.querySelector('#full-video div').innerHTML = contentData[currentLang].fullVideoContent;
+            break;
+        case 'short-video':
+            document.querySelector('#short-video div').innerHTML = contentData[currentLang].shortVideoContent;
+            break;
+        case 'story':
+            document.querySelector('#story div').innerHTML = contentData[currentLang].storyContent;
+            break;
+    }
+}
+
+// --- INITIALIZATION ---
+function createMainMenu() {
+    const menu = document.getElementById('main-menu');
+    menu.innerHTML = ''; // Clear it
+    const sections = [
+        {id: 'full-video', icon: '🔊'},
+        {id: 'short-video', icon: '📺'},
+        {id: 'story', icon: '📖'},
+        {id: 'read', icon: '📄'},
+        {id: 'flashcards-meaning', icon: '🧠'},
+        {id: 'flashcards-example', icon: '💡'},
+        {id: 'match', icon: '🔄'},
+        {id: 'quiz1', icon: '❓'},
+        {id: 'quiz2', icon: '⁉️'},
+        {id: 'game1', icon: '🏹'},
+        {id: 'game2', icon: '🗺️'}
+    ];
+    
+    sections.forEach((section) => {
+        const button = document.createElement('button');
+        button.id = `menu-btn-${section.id}`;
+        button.className = 'w-full text-left p-4 rounded-lg shadow-md transition transform hover:scale-105 bg-white flex items-center space-x-4';
+        button.onclick = () => openSection(section.id);
+        button.innerHTML = `
+            <span class="text-3xl">${section.icon}</span>
+            <span class="font-semibold text-gray-700 text-lg"></span>
+        `;
+        menu.appendChild(button);
+    });
+}
+
+
+// --- TAB-SPECIFIC FUNCTIONS ---
+
+function loadFlashcards(type) {
+    const containerId = `flashcards-${type}-container`;
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    const faults = contentData[currentLang].faults;
+
+    faults.forEach(fault => {
+        const cardHTML = `
+            <div class="flashcard-container">
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-face flashcard-front">
+                        <h3 class="text-xl font-bold">${fault.name}</h3>
+                    </div>
+                    <div class="flashcard-face flashcard-back">
+                        <p>${type === 'meaning' ? fault.meaning : fault.example}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += cardHTML;
+    });
+}
+
+function loadMatchFlashcards() {
+    const container = document.getElementById('match-flashcards-container');
+    container.innerHTML = '';
+    const faults = contentData[currentLang].faults;
+    const virtues = contentData[currentLang].virtues;
+
+    faults.forEach(fault => {
+        const correspondingVirtue = virtues.find(v => v.id === fault.id);
+        if (correspondingVirtue) {
+            const cardHTML = `
+                <div class="flashcard-container">
+                    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                        <div class="flashcard-face flashcard-front" style="background-color: #ef4444;">
+                            <h3 class="text-xl font-bold">${fault.name}</h3>
+                        </div>
+                        <div class="flashcard-face flashcard-back" style="background-color: #22c55e;">
+                            <h3 class="text-xl font-bold">${correspondingVirtue.name}</h3>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        }
+    });
+}
+
+// Quiz 1 Logic
+let quiz1Score = 0;
+let currentQuiz1Question = 0;
+let quiz1Data = [];
+
+function initQuiz1() {
+    quiz1Score = 0;
+    currentQuiz1Question = 0;
+    quiz1Data = [...contentData[currentLang].quiz1].sort(() => Math.random() - 0.5);
+    document.getElementById('quiz1-score').innerText = '';
+    document.getElementById('quiz1-restart-btn').classList.add('hidden');
+    loadQuiz1Question();
+}
+
+function loadQuiz1Question() {
+    const container = document.getElementById('quiz1-container');
+    container.innerHTML = '';
+    if (currentQuiz1Question >= quiz1Data.length) {
+        showQuiz1Result();
+        return;
+    }
+    const qData = quiz1Data[currentQuiz1Question];
+    let optionsHTML = '';
+    qData.o.forEach(option => {
+        optionsHTML += `<button onclick="checkQuiz1Answer('${option}', this)" class="block w-full text-left p-4 bg-gray-100 hover:bg-blue-100 rounded-lg border border-gray-200 transition">${option}</button>`;
+    });
+
+    const questionHTML = `
+        <div>
+            <h3 class="text-lg font-semibold mb-4">(${currentQuiz1Question + 1}/${quiz1Data.length}) ${qData.q}</h3>
+            <div class="space-y-3">${optionsHTML}</div>
+            <div id="quiz1-feedback" class="mt-4 p-4 rounded-lg hidden"></div>
+        </div>
+    `;
+    container.innerHTML = questionHTML;
+}
+
+function checkQuiz1Answer(selectedOption, btnElement) {
+    const qData = quiz1Data[currentQuiz1Question];
+    const feedbackEl = document.getElementById('quiz1-feedback');
+    const allOptions = btnElement.parentElement.children;
+    for(let btn of allOptions) {
+        btn.disabled = true;
+    }
+    
+    if (selectedOption === qData.a) {
+        quiz1Score++;
+        btnElement.classList.remove('bg-gray-100', 'hover:bg-blue-100');
+        btnElement.classList.add('bg-green-500', 'text-white');
+        feedbackEl.innerHTML = `<b>સાચો જવાબ!</b><br>${qData.exp}`;
+        feedbackEl.className = 'mt-4 p-4 rounded-lg bg-green-100 text-green-800';
+    } else {
+        btnElement.classList.remove('bg-gray-100', 'hover:bg-blue-100');
+        btnElement.classList.add('bg-red-500', 'text-white');
+        feedbackEl.innerHTML = `<b>ખોટો જવાબ.</b> સાચો જવાબ છે: <b>${qData.a}</b><br>${qData.exp}`;
+        feedbackEl.className = 'mt-4 p-4 rounded-lg bg-red-100 text-red-800';
+    }
+    feedbackEl.classList.remove('hidden');
+
+    currentQuiz1Question++;
+    setTimeout(loadQuiz1Question, 2500);
+}
+
+function showQuiz1Result() {
+    const container = document.getElementById('quiz1-container');
+    container.innerHTML = `<h3 class="text-2xl font-bold text-center">ક્વિઝ પૂર્ણ!</h3>`;
+    document.getElementById('quiz1-score').innerText = `તમારો સ્કોર: ${quiz1Score} / ${quiz1Data.length}`;
+    const restartBtn = document.getElementById('quiz1-restart-btn');
+    restartBtn.classList.remove('hidden');
+    restartBtn.onclick = initQuiz1;
+}
+
+
+// Quiz 2 Logic
+function initQuiz2() {
+    const container = document.getElementById('quiz2-container');
+    const data = contentData[currentLang].quiz2;
+    container.innerHTML = '';
+
+    data.forEach((q, index) => {
+        let optionsHTML = '';
+        q.o.forEach(option => {
+            optionsHTML += `
+                <label class="flex items-center p-3 bg-gray-100 rounded-lg hover:bg-cyan-100 transition cursor-pointer">
+                    <input type="checkbox" name="q${index}" value="${option}" class="h-5 w-5 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500">
+                    <span class="ml-3 text-gray-700">${option}</span>
+                </label>`;
+        });
+        const questionHTML = `
+            <div id="q2-${index}">
+                <h3 class="text-lg font-semibold mb-4">(${index+1}/${data.length}) ${q.q}</h3>
+                <div class="space-y-2">${optionsHTML}</div>
+                <div class="mt-2 text-sm font-medium"></div>
+            </div>`;
+        container.innerHTML += questionHTML;
+    });
+
+    document.getElementById('quiz2-submit-btn').onclick = checkQuiz2Answers;
+    document.getElementById('quiz2-submit-btn').classList.remove('hidden');
+    document.getElementById('quiz2-score').innerText = '';
+    const restartBtn = document.getElementById('quiz2-restart-btn');
+    restartBtn.classList.add('hidden');
+    restartBtn.onclick = initQuiz2;
+}
+
+function checkQuiz2Answers() {
+    const data = contentData[currentLang].quiz2;
+    let score = 0;
+    data.forEach((q, index) => {
+        const questionDiv = document.getElementById(`q2-${index}`);
+        const selectedOptions = Array.from(questionDiv.querySelectorAll('input:checked')).map(el => el.value);
+        const correctAnswers = q.a;
+        
+        const feedbackEl = questionDiv.querySelector('.font-medium');
+
+        if (selectedOptions.length === correctAnswers.length && selectedOptions.every(val => correctAnswers.includes(val))) {
+            score++;
+            feedbackEl.innerText = 'સાચો જવાબ!';
+            feedbackEl.className = 'mt-2 text-sm font-medium text-green-600';
+        } else {
+            feedbackEl.innerText = `ખોટો જવાબ. સાચા જવાબો: ${correctAnswers.join(', ')}`;
+            feedbackEl.className = 'mt-2 text-sm font-medium text-red-600';
+        }
+    });
+
+    document.getElementById('quiz2-score').innerText = `તમારો સ્કોર: ${score} / ${data.length}`;
+    document.getElementById('quiz2-submit-btn').classList.add('hidden');
+    document.getElementById('quiz2-restart-btn').classList.remove('hidden');
+}
+
+// Game 1 Logic (New Archery Game)
+const canvas1 = document.getElementById('gameCanvas1');
+const ctx1 = canvas1.getContext('2d');
+let game1Active = false;
+let score1;
+let targets;
+let flyingArrows;
+let arrowQueue;
+let game1Interval;
+
+let bow = {
+    x: canvas1.width / 2,
+    y: canvas1.height - 20,
+    radius: 15,
+    pullX: 0,
+    pullY: 0,
+    isPulling: false
+};
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function startGame1() {
+    game1Active = true;
+    score1 = 0;
+    targets = [];
+    flyingArrows = [];
+    
+    let faults = [...contentData[currentLang].faults];
+    let virtues = [...contentData[currentLang].virtues];
+    shuffleArray(faults);
+    shuffleArray(virtues);
+    arrowQueue = virtues;
+
+    faults.forEach((fault, i) => {
+        targets.push({
+            x: 40 + (i % 5) * 80 + Math.random() * 20,
+            y: 40 + Math.floor(i / 5) * 50,
+            radius: 20,
+            data: fault,
+            vx: Math.random() * 1 - 0.5,
+            vy: Math.random() * 1 - 0.5
+        });
+    });
+    
+    document.getElementById('start-game1-btn').innerText = "ફરીથી રમો";
+    if (game1Interval) clearInterval(game1Interval);
+    game1Interval = setInterval(updateGame1, 1000 / 60);
+}
+
+function updateGame1() {
+    if (!game1Active) return;
+
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+
+    // Draw Bow and Player
+    ctx1.fillStyle = '#3b82f6'; // blue-500
+    ctx1.beginPath();
+    ctx1.arc(bow.x, bow.y, bow.radius, 0, Math.PI * 2);
+    ctx1.fill();
+
+    // Draw aiming line
+    if (bow.isPulling) {
+        ctx1.beginPath();
+        ctx1.moveTo(bow.pullX, bow.pullY);
+        ctx1.lineTo(bow.x, bow.y);
+        ctx1.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx1.lineWidth = 2;
+        ctx1.stroke();
+    }
+    
+    // Update and Draw Targets
+    targets.forEach(target => {
+        target.x += target.vx;
+        target.y += target.vy;
+        if (target.x + target.radius > canvas1.width || target.x - target.radius < 0) target.vx *= -1;
+        if (target.y + target.radius > canvas1.height / 2 || target.y - target.radius < 0) target.vy *= -1;
+
+        ctx1.beginPath();
+        ctx1.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
+        ctx1.fillStyle = '#ef4444'; // red-500
+        ctx1.fill();
+        ctx1.fillStyle = 'white';
+        ctx1.font = '10px Inter';
+        ctx1.textAlign = 'center';
+        ctx1.fillText(target.data.name, target.x, target.y + 3);
+    });
+
+    // Update and Draw Arrows
+    flyingArrows.forEach((arrow, index) => {
+        arrow.x += arrow.vx;
+        arrow.y += arrow.vy;
+        arrow.vy += 0.05; // gravity
+
+        ctx1.beginPath();
+        ctx1.moveTo(arrow.x, arrow.y);
+        ctx1.lineTo(arrow.x - arrow.vx * 2, arrow.y - arrow.vy * 2);
+        ctx1.strokeStyle = '#22c55e'; // green-500
+        ctx1.lineWidth = 3;
+        ctx1.stroke();
+
+        // Check collision
+        targets.forEach((target, tIndex) => {
+            const dist = Math.hypot(arrow.x - target.x, arrow.y - target.y);
+            if (dist < target.radius) {
+                if (arrow.data.id === target.data.id) {
+                    score1 += 10;
+                    targets.splice(tIndex, 1); // Correct hit
+                } else {
+                    score1 -= 5;
+                }
+                flyingArrows.splice(index, 1);
+            }
+        });
+
+        if (arrow.y > canvas1.height) flyingArrows.splice(index, 1);
+    });
+    
+    // Draw HUD
+    const nextArrow = arrowQueue.length > 0 ? arrowQueue[0].name : "---";
+    document.getElementById('game1-info').innerText = `Score: ${score1} | Next Arrow: ${nextArrow}`;
+    
+    if (targets.length === 0) {
+        endGame1(true);
+    } else if (arrowQueue.length === 0 && flyingArrows.length === 0) {
+        endGame1(false);
+    }
+}
+
+function endGame1(won) {
+    game1Active = false;
+    clearInterval(game1Interval);
+    ctx1.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
+    ctx1.fillStyle = 'white';
+    ctx1.font = '30px Inter';
+    ctx1.textAlign = 'center';
+    ctx1.fillText(won ? "તમે જીતી ગયા!" : "રમત પૂર્ણ!", canvas1.width / 2, canvas1.height / 2 - 20);
+    ctx1.font = '20px Inter';
+    ctx1.fillText(`ફાઇનલ સ્કોર: ${score1}`, canvas1.width / 2, canvas1.height / 2 + 20);
+    ctx1.textAlign = 'start';
+    document.getElementById('start-game1-btn').innerText = "ફરીથી રમો";
+}
+
+function drawGame1Preview(){
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+    ctx1.fillStyle = 'black';
+    ctx1.font = '20px Inter';
+    ctx1.textAlign = 'center';
+    ctx1.fillText("રમત શરૂ કરવા 'શરૂ કરો' બટન દબાવો", canvas1.width / 2, canvas1.height / 2);
+    ctx1.textAlign = 'start';
+}
+
+
+document.getElementById('start-game1-btn').addEventListener('click', startGame1);
+canvas1.addEventListener('mousedown', startPull);
+canvas1.addEventListener('mousemove', pullBow);
+canvas1.addEventListener('mouseup', releaseBow);
+canvas1.addEventListener('touchstart', startPull);
+canvas1.addEventListener('touchmove', pullBow);
+canvas1.addEventListener('touchend', releaseBow);
+
+function getMousePos(e) {
+    const rect = canvas1.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+    };
+}
+
+function startPull(e) {
+    if (!game1Active || arrowQueue.length === 0) return;
+    e.preventDefault();
+    const pos = getMousePos(e);
+    const dist = Math.hypot(pos.x - bow.x, pos.y - bow.y);
+    if (dist < bow.radius) {
+        bow.isPulling = true;
+        bow.pullX = pos.x;
+        bow.pullY = pos.y;
+    }
+}
+
+function pullBow(e) {
+    if (!bow.isPulling) return;
+    e.preventDefault();
+    const pos = getMousePos(e);
+    bow.pullX = pos.x;
+    bow.pullY = pos.y;
+}
+
+function releaseBow(e) {
+    if (!bow.isPulling) return;
+    e.preventDefault();
+    bow.isPulling = false;
+    
+    const power = Math.hypot(bow.x - bow.pullX, bow.y - bow.pullY) / 10;
+    const angle = Math.atan2(bow.y - bow.pullY, bow.x - bow.pullX);
+    
+    const arrow = {
+        x: bow.x,
+        y: bow.y,
+        vx: Math.cos(angle) * power,
+        vy: Math.sin(angle) * power,
+        data: arrowQueue.shift()
+    };
+    flyingArrows.push(arrow);
+}
+
+
+// --- Game 2 Logic: Maze ---
+const canvas2 = document.getElementById('gameCanvas2');
+const ctx2 = canvas2.getContext('2d');
+let game2Active = false;
+const TILE_SIZE = 40;
+const MAZE_COLS = canvas2.width / TILE_SIZE;
+const MAZE_ROWS = canvas2.height / TILE_SIZE;
+let maze, player2, goal, currentWall;
+
+const mazeLayout = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 10, 0, 0, 0, 1, 15, 0, 0, 0, 16, 1],
+    [1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+    [1, 11, 0, 0, 0, 1, 14, 0, 0, 0, 17, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+    [1, 12, 0, 0, 1, 19, 0, 0, 0, 18, 0, 1],
+    [1, 1, 1, 13, 0, 0, 0, 1, 1, 1, 0, 1], 
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+];
+// Wall numbers 10-19 correspond to fault IDs 1-10
+
+function startGame2() {
+    game2Active = true;
+    player2 = { x: 0, y: 1 };
+    goal = { x: 10, y: 6 };
+    drawMaze();
+}
+
+document.getElementById('start-game2-btn').addEventListener('click', () => {
+    if (game2Active && player2.x === 0 && player2.y === 1) return; // a reset condition
+    startGame2();
+});
+
+function drawMaze() {
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+    const faults = contentData[currentLang].faults;
+
+    for (let row = 0; row < MAZE_ROWS; row++) {
+        for (let col = 0; col < MAZE_COLS; col++) {
+            const tile = mazeLayout[row][col];
+            if (tile === 1) { // Wall
+                ctx2.fillStyle = '#6b7280'; // gray-500
+                ctx2.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            } else if (tile >= 10) { // Fault Wall
+                ctx2.fillStyle = '#ef4444'; // red-500
+                ctx2.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                ctx2.fillStyle = 'white';
+                ctx2.font = '10px Inter';
+                ctx2.textAlign = 'center';
+                const fault = faults.find(f => f.id === (tile - 9));
+                if (fault) {
+                    ctx2.fillText(fault.name, col * TILE_SIZE + TILE_SIZE / 2, row * TILE_SIZE + TILE_SIZE / 2 + 4);
+                }
+            }
+        }
+    }
+    // Draw Goal
+    ctx2.font = '24px Inter';
+    ctx2.fillText('⭐️', goal.x * TILE_SIZE + TILE_SIZE / 2, goal.y * TILE_SIZE + TILE_SIZE / 2 + 8);
+    // Draw Player
+    ctx2.fillStyle = '#3b82f6'; // blue-500
+    ctx2.beginPath();
+    ctx2.arc(player2.x * TILE_SIZE + TILE_SIZE / 2, player2.y * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 2 - 5, 0, Math.PI * 2);
+    ctx2.fill();
+    ctx2.textAlign = 'start';
+}
+
+function movePlayer2(dx, dy) {
+    if (!game2Active) return;
+    const nextX = player2.x + dx;
+    const nextY = player2.y + dy;
+
+    if (nextX >= 0 && nextX < MAZE_COLS && nextY >= 0 && nextY < MAZE_ROWS) {
+        const tile = mazeLayout[nextY][nextX];
+        if (tile === 0) {
+            player2.x = nextX;
+            player2.y = nextY;
+        } else if (tile > 1) {
+            // Hit a fault wall
+            handleWallCollision(tile, nextX, nextY);
+        }
+        drawMaze();
+        checkWinCondition();
+    }
+}
+
+function handleWallCollision(wallId, wallX, wallY) {
+    const fault = contentData[currentLang].faults.find(f => f.id === (wallId - 9));
+    if (!fault) return;
+    currentWall = { id: wallId, x: wallX, y: wallY, faultId: fault.id };
+    const modal = document.getElementById('game2-question-modal');
+    const questionText = document.getElementById('game2-question-text');
+    const optionsContainer = document.getElementById('game2-options');
+    
+    // Simple question: what is the opposite virtue?
+    const correctVirtue = contentData[currentLang].virtues.find(v => v.id === fault.id);
+    const otherVirtues = contentData[currentLang].virtues.filter(v => v.id !== fault.id);
+    
+    // Create 3 options: 1 correct, 2 wrong
+    let options = [correctVirtue];
+    while(options.length < 3) {
+        let randomVirtue = otherVirtues[Math.floor(Math.random() * otherVirtues.length)];
+        if(!options.find(o => o.id === randomVirtue.id)) {
+            options.push(randomVirtue);
+        }
+    }
+    options.sort(() => Math.random() - 0.5); // Shuffle
+
+    questionText.innerText = `'${fault.name}' ને હરાવવા માટે કયો સદગુણ જોઈએ?`;
+    if (currentLang === 'hi') questionText.innerText = `'${fault.name}' को हराने के लिए कौन सा सद्गुण चाहिए?`;
+    if (currentLang === 'en') questionText.innerText = `Which virtue is needed to defeat '${fault.name}'?`;
+
+    optionsContainer.innerHTML = '';
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.innerText = opt.name;
+        btn.className = 'block w-full text-center p-3 bg-gray-200 hover:bg-blue-200 rounded-lg transition';
+        btn.onclick = () => checkGame2Answer(opt.id);
+        optionsContainer.appendChild(btn);
+    });
+
+    modal.style.display = 'flex';
+}
+
+function checkGame2Answer(selectedId) {
+    if (selectedId === currentWall.faultId) {
+        // Correct answer, remove wall
+        mazeLayout[currentWall.y][currentWall.x] = 0;
+        player2.x = currentWall.x;
+        player2.y = currentWall.y;
+        drawMaze();
+        checkWinCondition();
+    } else {
+        // Wrong answer, reset player
+        player2.x = 0;
+        player2.y = 1;
+        drawMaze();
+    }
+    closeGame2Question();
+}
+
+function checkWinCondition() {
+    if (player2.x === goal.x && player2.y === goal.y) {
+        game2Active = false;
+        ctx2.fillStyle = 'rgba(0, 128, 0, 0.7)';
+        ctx2.fillRect(0, 0, canvas2.width, canvas2.height);
+        ctx2.fillStyle = 'white';
+        ctx2.font = '30px Inter';
+        ctx2.textAlign = 'center';
+        ctx2.fillText('Congratulations!', canvas2.width / 2, canvas2.height / 2);
+    }
+}
+
+function closeGame2Question() {
+    document.getElementById('game2-question-modal').style.display = 'none';
+}
+
+
+document.addEventListener('keydown', e => {
+    if(activeSection !== 'game2') return;
+    if (e.key === 'ArrowUp') movePlayer2(0, -1);
+    if (e.key === 'ArrowDown') movePlayer2(0, 1);
+    if (e.key === 'ArrowLeft') movePlayer2(-1, 0);
+    if (e.key === 'ArrowRight') movePlayer2(1, 0);
+});
+// Touch controls for Game 2
+let touchStartX = 0;
+let touchStartY = 0;
+canvas2.addEventListener('touchstart', e => {
+    if (!game2Active) return;
+    e.preventDefault();
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+});
+canvas2.addEventListener('touchmove', e => {
+    if (!game2Active) return;
+    e.preventDefault();
+}, { passive: false });
+canvas2.addEventListener('touchend', e => {
+    if (!game2Active) return;
+    e.preventDefault();
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const dx = touchEndX - touchStartX;
+    const dy = touchEndY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy)) { // Horizontal swipe
+        if (dx > 0) movePlayer2(1, 0); else movePlayer2(-1, 0);
+    } else { // Vertical swipe
+        if (dy > 0) movePlayer2(0, 1); else movePlayer2(0, -1);
+    }
+});
+
+
+// --- HELP MODAL ---
+function showHelp(gameId) {
+    const modal = document.getElementById('help-modal');
+    const content = document.getElementById('help-content');
+    if (gameId === 'game1') {
+        content.innerHTML = contentData[currentLang].ui['game1-help'];
+    } else {
+        content.innerHTML = contentData[currentLang].ui['game2-help'];
+    }
+    modal.style.display = 'flex';
+}
+function closeHelp() {
+    document.getElementById('help-modal').style.display = 'none';
+}
+
+// --- INITIALIZATION ---
+window.addEventListener('DOMContentLoaded', () => {
+    createMainMenu();
+    changeLanguage('gu');
+    goToMainMenu();
+});
+
+</script>
+</body>
+</html>
+
